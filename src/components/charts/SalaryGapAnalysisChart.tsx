@@ -1,5 +1,5 @@
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from 'recharts';
 import { companyUnits } from '@/services/performanceData';
 
 const SalaryGapAnalysisChart = () => {
@@ -35,11 +35,11 @@ const SalaryGapAnalysisChart = () => {
             }}
           />
           <ReferenceLine y={1.3} stroke="#ef4444" strokeDasharray="5 5" label="目标线(1.3倍)" />
-          <Bar 
-            dataKey="ratio" 
-            fill={(entry: any) => entry.status === 'qualified' ? '#007470' : '#fbbf24'}
-            radius={[4, 4, 0, 0]}
-          />
+          <Bar dataKey="ratio" radius={[4, 4, 0, 0]}>
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.status === 'qualified' ? '#007470' : '#fbbf24'} />
+            ))}
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>

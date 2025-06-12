@@ -1,16 +1,17 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, Users, DollarSign, Target, AlertTriangle } from "lucide-react";
+import { TrendingUp, Users, DollarSign, Target, AlertTriangle, Award, BarChart } from "lucide-react";
 import PerformanceScoreChart from "./charts/PerformanceScoreChart";
 import PerformanceTrendChart from "./charts/PerformanceTrendChart";
 import PerformanceLevelPieChart from "./charts/PerformanceLevelPieChart";
 import SalaryDistributionChart from "./charts/SalaryDistributionChart";
-import SalaryUtilizationChart from "./charts/SalaryUtilizationChart";
 import PerformanceRatioChart from "./charts/PerformanceRatioChart";
 import SalaryGapAnalysisChart from "./charts/SalaryGapAnalysisChart";
 import TopRankingChart from "./charts/TopRankingChart";
+import PerformanceDistributionChart from "./charts/PerformanceDistributionChart";
+import SalaryComparisonChart from "./charts/SalaryComparisonChart";
+import IncentiveEffectivenessChart from "./charts/IncentiveEffectivenessChart";
 import { companyUnits } from "@/services/performanceData";
 
 const PerformanceDashboard = () => {
@@ -18,8 +19,8 @@ const PerformanceDashboard = () => {
   const avgScore = companyUnits.reduce((sum, unit) => sum + unit.score, 0) / totalUnits;
   const totalBudget = companyUnits.reduce((sum, unit) => sum + unit.salaryBudget, 0);
   const totalActual = companyUnits.reduce((sum, unit) => sum + unit.actualSalary, 0);
-  const avgUtilization = (totalActual / totalBudget) * 100;
   const unitsWithLowGap = companyUnits.filter(unit => unit.salaryGapRatio < 1.3).length;
+  const aLevelUnits = companyUnits.filter(unit => unit.level === 'A').length;
 
   return (
     <div className="p-6 bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
@@ -40,7 +41,7 @@ const PerformanceDashboard = () => {
       </div>
 
       {/* 关键指标卡片 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         <Card className="border-l-4 border-l-[#007470]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -57,8 +58,8 @@ const PerformanceDashboard = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">工资包使用率</p>
-                <p className="text-2xl font-bold text-blue-600">{avgUtilization.toFixed(1)}%</p>
+                <p className="text-sm font-medium text-slate-600">总薪酬预算</p>
+                <p className="text-2xl font-bold text-blue-600">{(totalBudget / 10000).toFixed(0)}万</p>
               </div>
               <DollarSign className="w-8 h-8 text-blue-500 opacity-60" />
             </div>
@@ -88,104 +89,142 @@ const PerformanceDashboard = () => {
             </div>
           </CardContent>
         </Card>
+
+        <Card className="border-l-4 border-l-purple-500">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-600">A级单位数</p>
+                <p className="text-2xl font-bold text-purple-600">{aLevelUnits}</p>
+              </div>
+              <Award className="w-8 h-8 text-purple-500 opacity-60" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* 主要图表区域 */}
-      <Tabs defaultValue="performance" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 bg-white">
-          <TabsTrigger value="performance" className="data-[state=active]:bg-[#007470] data-[state=active]:text-white">
-            组织绩效考核
-          </TabsTrigger>
-          <TabsTrigger value="salary" className="data-[state=active]:bg-[#007470] data-[state=active]:text-white">
-            薪酬配置总览
-          </TabsTrigger>
-          <TabsTrigger value="incentive" className="data-[state=active]:bg-[#007470] data-[state=active]:text-white">
-            激励效果分析
-          </TabsTrigger>
-          <TabsTrigger value="ranking" className="data-[state=active]:bg-[#007470] data-[state=active]:text-white">
-            综合诊断排名
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="performance" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-[#007470]">单位绩效得分分布</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <PerformanceScoreChart />
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-[#007470]">单位绩效等级分布</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <PerformanceLevelPieChart />
-              </CardContent>
-            </Card>
-          </div>
+      {/* 一、组织绩效考核结果总览 */}
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-6">
+          <BarChart className="w-6 h-6 text-[#007470]" />
+          <h2 className="text-2xl font-bold text-slate-800">一、组织绩效考核结果总览</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-[#007470]">单位绩效得分分布</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PerformanceScoreChart />
+            </CardContent>
+          </Card>
           
           <Card>
             <CardHeader>
-              <CardTitle className="text-[#007470]">单位绩效得分趋势（最近6个月）</CardTitle>
+              <CardTitle className="text-[#007470]">单位绩效等级分布</CardTitle>
             </CardHeader>
             <CardContent>
-              <PerformanceTrendChart />
+              <PerformanceLevelPieChart />
             </CardContent>
           </Card>
-        </TabsContent>
+        </div>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-[#007470]">单位绩效得分趋势（最近6个月）</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PerformanceTrendChart />
+          </CardContent>
+        </Card>
+      </div>
 
-        <TabsContent value="salary" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-[#007470]">单位定员承包工资分布</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <SalaryDistributionChart />
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-[#007470]">单位工资包使用率</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <SalaryUtilizationChart />
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
+      {/* 二、单位绩效薪酬配置总览 */}
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-6">
+          <DollarSign className="w-6 h-6 text-[#007470]" />
+          <h2 className="text-2xl font-bold text-slate-800">二、单位绩效薪酬配置总览</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-[#007470]">单位定员承包工资分布</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <SalaryDistributionChart />
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-[#007470]">单位人均薪酬与绩效对比</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <SalaryComparisonChart />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
-        <TabsContent value="incentive" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-[#007470]">绩效倍比分布（5档）</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <PerformanceRatioChart />
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-[#007470]">绩效薪酬拉差分析</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <SalaryGapAnalysisChart />
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
+      {/* 三、绩效激励效果分析 */}
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-6">
+          <TrendingUp className="w-6 h-6 text-[#007470]" />
+          <h2 className="text-2xl font-bold text-slate-800">三、绩效激励效果分析</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-[#007470]">绩效倍比分布（5档）</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PerformanceRatioChart />
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-[#007470]">绩效薪酬拉差分析</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <SalaryGapAnalysisChart />
+            </CardContent>
+          </Card>
+        </div>
 
-        <TabsContent value="ranking" className="space-y-6">
-          <TopRankingChart />
-        </TabsContent>
-      </Tabs>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-[#007470]">全公司绩效分档分布</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PerformanceDistributionChart />
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-[#007470]">激励效果散点分析</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <IncentiveEffectivenessChart />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* 四、综合诊断与排行榜展示 */}
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-6">
+          <Award className="w-6 h-6 text-[#007470]" />
+          <h2 className="text-2xl font-bold text-slate-800">四、综合诊断与排行榜展示</h2>
+        </div>
+        
+        <TopRankingChart />
+      </div>
     </div>
   );
 };
